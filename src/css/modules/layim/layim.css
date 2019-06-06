@@ -220,8 +220,8 @@ body .layui-layim-face  .layui-layer-content{padding:0; background-color:#fff; c
 .layim-chat-send .layim-menu-box li{padding-right: 15px; line-height: 28px;}
 
 /* 联系人面板 */
-.layim-contact-list{ width: 250px;background-color: #fff;}
-.layim-contact-list .layui-tab{ margin: 0;}
+.layim-contact-list{ background-color: #fff;}
+.layim-contact-list .layui-tab{ margin: 0;position: fixed;width: 250px;}
 .layim-contact-list .layui-tab-title{ height: 41px;border-color: #ebebec;text-align: center;}
 .layim-contact-list .layui-tab-title li{ line-height: 41px;min-width: initial;padding: 0 5px;margin: 0 20px;color: #999;}
 .layim-contact-list .layui-tab-title .layui-this{ color: #0188fb;}
@@ -229,7 +229,7 @@ body .layui-layim-face  .layui-layer-content{padding:0; background-color:#fff; c
 .layim-contact-list .layui-tab-content{ padding: 0;}
 .layim-list-friend{padding: 10px 0;overflow: hidden; overflow-y: auto;}
 .layim-list-group{overflow: hidden; overflow-y: auto;}
-.layim-contact-box{ position: absolute;top: 56px;margin-left: 250px;background-color: #e5e7ec;}
+.layim-contact-box{ margin-left: 250px;background-color: #e5e7ec;}
 /* 最小化 */
 body .layui-layim-min {
     border: 1px solid #D9D9D9;

@@ -24,8 +24,13 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
     //对外API
     var LAYIM = function () {
         this.v = v;
-        $('body').on('click', '*[layim-event]', function (e) {
-            var othis = $(this), methid = othis.attr('layim-event');
+        $('body').on('click', '*[layim-click]', function (e) {
+            var othis = $(this), methid = othis.attr('layim-click');
+            events[methid] ? events[methid].call(this, othis, e) : '';
+        });
+        
+        $('body').on('dblclick', '*[layim-dblclick]', function (e) {
+            var othis = $(this), methid = othis.attr('layim-dblclick');
             events[methid] ? events[methid].call(this, othis, e) : '';
         });
     };
@@ -132,18 +137,17 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
 
 
     //主模板
-    var listTpl = function (options) {
+    var contactTpl = function (options) {
         var nodata = {
             friend: "该分组下暂无好友"
             , group: "暂无群组"
-            , history: "暂无历史会话"
         };
 
         options = options || {};
         options.item = options.item || ('d.' + options.type);
 
         return ['{{# var length = 0; layui.each(' + options.item + ', function(i, data){ length++; }}'
-            , '<li layim-event="chat" data-type="' + options.type + '" data-index="{{ ' + (options.index || 'i') + ' }}" class="layim-' + (options.type === 'history' ? '{{i}}' : options.type + '{{data.id}}') + ' {{ data.status === "offline" ? "layim-list-gray" : "" }}"><img src="{{ data.avatar }}"><span>{{ data.username||data.groupname||data.name||"佚名" }}</span><p>{{ data.remark||data.sign||"" }}</p><span class="layim-msg-status">new</span></li>'
+            , '<li layim-click="info" layim-dblclick="chat" data-type="' + options.type + '" data-index="{{ ' + (options.index || 'i') + ' }}" class="layim-' + (options.type === 'history' ? '{{i}}' : options.type + '{{data.id}}') + ' {{ data.status === "offline" ? "layim-list-gray" : "" }}"><img src="{{ data.avatar }}"><span>{{ data.username||data.groupname||data.name||"佚名" }}</span><p>{{ data.remark||data.sign||"" }}</p><span class="layim-msg-status">new</span></li>'
             , '{{# }); if(length === 0){ }}'
             , '<li class="layim-null">' + (nodata[options.type] || "暂无数据") + '</li>'
             , '{{# } }}'].join('');
@@ -155,7 +159,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         return [
             '<ul  class="layui-unselect layim-chat-list layim-list-history">'
             , '{{# var length = 0; layui.each(' + options.item + ', function(i, data){ length++; }}'
-            , '<li class="layim-{{ data.type }}{{ data.id }} layim-chatlist-{{ data.type }}{{ data.id }}{{ Object.getOwnPropertyNames(' + options.item + ').length == length ? " layim-this" : ""}}" layim-event="tabChat"><img src="{{ data.avatar }}"><span>{{ data.name||"佚名" }}</span>{{# if(!d.base.brief){ }}<i class="layui-icon" layim-event="closeChat">&#x1007;</i>{{# } }}</li>'
+            , '<li class="layim-{{ data.type }}{{ data.id }} layim-chatlist-{{ data.type }}{{ data.id }}{{ Object.getOwnPropertyNames(' + options.item + ').length == length ? " layim-this" : ""}}" layim-click="tabChat"><img src="{{ data.avatar }}"><span>{{ data.name||"佚名" }}</span>{{# if(!d.base.brief){ }}<i class="layui-icon" layim-click="closeChat">&#x1007;</i>{{# } }}</li>'
             , '{{# }); if(length === 0){ }}'
             , '<li class="layim-null">暂时无会话</li>'
             , '{{# } }}'
@@ -175,37 +179,37 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             , '</div>'
             , '<div class="layim-chat-footer">'
             , '<div class="layui-unselect layim-chat-tool" data-json="{{encodeURIComponent(JSON.stringify(data))}}">'
-            , '<span class="layui-icon layim-tool-face" title="选择表情" layim-event="face">&#xe60c;</span>'
+            , '<span class="layui-icon layim-tool-face" title="选择表情" layim-click="face">&#xe60c;</span>'
             , '{{# if(d.base && d.base.uploadImage){ }}'
-            , '<span class="layui-icon layim-tool-image" title="上传图片" layim-event="image">&#xe60d;<input type="file" name="file"></span>'
+            , '<span class="layui-icon layim-tool-image" title="上传图片" layim-click="image">&#xe60d;<input type="file" name="file"></span>'
             , '{{# }; }}'
             , '{{# if(d.base && d.base.uploadFile){ }}'
-            , '<span class="layui-icon layim-tool-image" title="发送文件" layim-event="image" data-type="file">&#xe61d;<input type="file" name="file"></span>'
+            , '<span class="layui-icon layim-tool-image" title="发送文件" layim-click="image" data-type="file">&#xe61d;<input type="file" name="file"></span>'
             , '{{# }; }}'
             , '{{# if(d.base && d.base.isAudio){ }}'
-            , '<span class="layui-icon layim-tool-audio" title="发送网络音频" layim-event="media" data-type="audio">&#xe6fc;</span>'
+            , '<span class="layui-icon layim-tool-audio" title="发送网络音频" layim-click="media" data-type="audio">&#xe6fc;</span>'
             , '{{# }; }}'
             , '{{# if(d.base && d.base.isVideo){ }}'
-            , '<span class="layui-icon layim-tool-video" title="发送网络视频" layim-event="media" data-type="video">&#xe6ed;</span>'
+            , '<span class="layui-icon layim-tool-video" title="发送网络视频" layim-click="media" data-type="video">&#xe6ed;</span>'
             , '{{# }; }}'
             , '{{# layui.each(d.base.tool, function(index, item){ }}'
-            , '<span class="layui-icon layim-tool-{{item.alias}}" title="{{item.title}}" layim-event="extend" lay-filter="{{ item.alias }}">{{item.icon}}</span>'
+            , '<span class="layui-icon layim-tool-{{item.alias}}" title="{{item.title}}" layim-click="extend" lay-filter="{{ item.alias }}">{{item.icon}}</span>'
             , '{{# }); }}'
             , '{{# if(d.base && d.base.chatLog){ }}'
-            , '<span class="layim-tool-log" layim-event="chatLog"><i class="layui-icon">&#xe60e;</i>聊天记录</span>'
+            , '<span class="layim-tool-log" layim-click="chatLog"><i class="layui-icon">&#xe60e;</i>聊天记录</span>'
             , '{{# }; }}'
             , '</div>'
             , '<div class="layim-chat-textarea"><textarea></textarea></div>'
             , '<div class="layim-chat-bottom">'
             , '<div class="layim-chat-send">'
             //, '{{# if(!d.base.brief){ }}'
-            //, '<span class="layim-send-close" layim-event="closeThisChat">关闭</span>'
+            //, '<span class="layim-send-close" layim-click="closeThisChat">关闭</span>'
             //, '{{# } }}'
-            , '<span class="layim-send-btn" layim-event="send">发送</span>'
-            , '<span class="layim-send-set" layim-event="setSend" lay-type="show"><em class="layui-edge"></em></span>'
+            , '<span class="layim-send-btn" layim-click="send">发送</span>'
+            , '<span class="layim-send-set" layim-click="setSend" lay-type="show"><em class="layui-edge"></em></span>'
             , '<ul class="layui-anim layim-menu-box">'
-            , '<li {{d.local.sendHotKey !== "Ctrl+Enter" ? "class=layim-this" : ""}} layim-event="setSend" lay-type="Enter"><i class="layui-icon">&#xe618;</i>按Enter键发送消息</li>'
-            , '<li {{d.local.sendHotKey === "Ctrl+Enter" ? "class=layim-this" : ""}} layim-event="setSend"  lay-type="Ctrl+Enter"><i class="layui-icon">&#xe618;</i>按Ctrl+Enter键发送消息</li>'
+            , '<li {{d.local.sendHotKey !== "Ctrl+Enter" ? "class=layim-this" : ""}} layim-click="setSend" lay-type="Enter"><i class="layui-icon">&#xe618;</i>按Enter键发送消息</li>'
+            , '<li {{d.local.sendHotKey === "Ctrl+Enter" ? "class=layim-this" : ""}} layim-click="setSend"  lay-type="Ctrl+Enter"><i class="layui-icon">&#xe618;</i>按Ctrl+Enter键发送消息</li>'
             , '</ul>'
             , '</div>'
             , '</div>'
@@ -226,8 +230,8 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '<input type="text" name="keyword" readonly class="layui-input">'
         , '</div>'
         , '<ul class="layui-anim layim-menu-box">'
-        , '<li {{d.mine.status === "online" ? "class=layim-this" : ""}} layim-event="status" lay-type="online"><i class="layui-icon">&#xe605;</i><cite class="layui-icon layim-status-online">&#xe617;</cite>在线</li>'
-        , '<li {{d.mine.status === "hide" ? "class=layim-this" : ""}} layim-event="status" lay-type="hide"><i class="layui-icon">&#xe605;</i><cite class="layui-icon layim-status-hide">&#xe60f;</cite>隐身</li>'
+        , '<li {{d.mine.status === "online" ? "class=layim-this" : ""}} layim-click="status" lay-type="online"><i class="layui-icon">&#xe605;</i><cite class="layui-icon layim-status-online">&#xe617;</cite>在线</li>'
+        , '<li {{d.mine.status === "hide" ? "class=layim-this" : ""}} layim-click="status" lay-type="hide"><i class="layui-icon">&#xe605;</i><cite class="layui-icon layim-status-hide">&#xe60f;</cite>隐身</li>'
         , '</ul>'
         , '</div>'
         , '</div>'
@@ -241,19 +245,19 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '{{# } else { }}'
         , ' layim-this'
         , '{{# } }}'
-        , '" title="消息" layim-event="tab" lay-type="history">&#xe611;</li>'
+        , '" title="消息" layim-click="tab" lay-type="history">&#xe611;</li>'
         , '<li class="layui-icon'
         , '{{# if(!d.base.isgroup){ }}'
         , ' layim-hide'
         , '{{# } else if(!d.base.isfriend) { }}'
         , ' layim-this'
         , '{{# } }}'
-        , '" title="联系人" layim-event="tab" lay-type="group">&#xe613;</li>'
-        , '<li class="layui-icon" title="文件" layim-event="tab" lay-type="friend">&#xe64a;</li>'
+        , '" title="联系人" layim-click="tab" lay-type="group">&#xe613;</li>'
+        , '<li class="layui-icon" title="文件" layim-click="tab" lay-type="friend">&#xe64a;</li>'
         , '</ul>'
         , '</div>'
         , '</div>'
-        , '<div class="layui-unselect layim-tab-content layui-show">'
+        , '<div id="layui-layim-chat" class="layui-unselect layim-tab-content layui-show">'
         , historyTpl({
             type: 'history'
         })
@@ -270,11 +274,11 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '<ul class="layui-unselect layim-list-friend">'
         , '{{# layui.each(d.friend, function(index, item){ var spread = d.local["spread"+index]; }}'
         , '<li>'
-        , '<h5 layim-event="spread" lay-type="{{ spread }}"><i class="layui-icon">{{# if(spread === "true"){ }}&#xe625;{{# } else {  }}&#xe623;{{# } }}</i><span>{{ item.groupname||"未命名分组"+index }}</span><em>(<cite class="layim-count"> {{ (item.list||[]).length }}</cite>)</em></h5>'
+        , '<h5 layim-click="spread" lay-type="{{ spread }}"><i class="layui-icon">{{# if(spread === "true"){ }}&#xe625;{{# } else {  }}&#xe623;{{# } }}</i><span>{{ item.groupname||"未命名分组"+index }}</span><em>(<cite class="layim-count"> {{ (item.list||[]).length }}</cite>)</em></h5>'
         , '<ul class="layui-layim-list {{# if(spread === "true"){ }}'
         , ' layui-show'
         , '{{# } }}">'
-        , listTpl({
+        , contactTpl({
             type: "friend"
             , item: "item.list"
             , index: "index"
@@ -288,19 +292,19 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '</div>'
         , '<div class="layui-tab-item">'
         , '<ul class="layui-unselect layui-layim-list layim-list-group">'
-        , listTpl({
+        , contactTpl({
             type: 'group'
         })
         , '</ul>'
         , '</div>'
         , '</div>'
         , '</div>'
-        , '</div>'
         , '<div class="layim-contact-box"></div>'
+        , '</div>'
         , '<ul class="layui-unselect layim-tab-content">'
         , '<li>'
         , '<ul class="layui-layim-list layui-show layim-list-group">'
-        , listTpl({
+        , contactTpl({
             type: 'group'
         })
         , '</ul>'
@@ -313,35 +317,37 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '</li>'
         , '</ul>'
         //, '<ul class="layui-unselect layui-layim-tool">'
-        //, '<li class="layui-icon layim-tool-search" layim-event="search" title="搜索">&#xe615;</li>'
+        //, '<li class="layui-icon layim-tool-search" layim-click="search" title="搜索">&#xe615;</li>'
         //, '{{# if(d.base.msgbox){ }}'
-        //, '<li class="layui-icon layim-tool-msgbox" layim-event="msgbox" title="消息盒子">&#xe645;<span class="layui-anim"></span></li>'
+        //, '<li class="layui-icon layim-tool-msgbox" layim-click="msgbox" title="消息盒子">&#xe645;<span class="layui-anim"></span></li>'
         //, '{{# } }}'
         //, '{{# if(d.base.find){ }}'
-        //, '<li class="layui-icon layim-tool-find" layim-event="find" title="查找">&#xe608;</li>'
+        //, '<li class="layui-icon layim-tool-find" layim-click="find" title="查找">&#xe608;</li>'
         //, '{{# } }}'
-        //, '<li class="layui-icon layim-tool-skin" layim-event="skin" title="更换背景">&#xe61b;</li>'
+        //, '<li class="layui-icon layim-tool-skin" layim-click="skin" title="更换背景">&#xe61b;</li>'
         //, '{{# if(!d.base.copyright){ }}'
-        //, '<li class="layui-icon layim-tool-about" layim-event="about" title="关于">&#xe60b;</li>'
+        //, '<li class="layui-icon layim-tool-about" layim-click="about" title="关于">&#xe60b;</li>'
         //, '{{# } }}'
         //, '</ul>'
-        , '<div class="layui-layim-search"><input><label class="layui-icon" layim-event="closeSearch">&#x1007;</label></div>'
+        , '<div class="layui-layim-search"><input><label class="layui-icon" layim-click="closeSearch">&#x1007;</label></div>'
         , '</div>'].join('');
 
     //换肤模版
     var elemSkinTpl = ['<ul class="layui-layim-skin">'
         , '{{# layui.each(d.skin, function(index, item){ }}'
-        , '<li><img layim-event="setSkin" src="{{ item }}"></li>'
+        , '<li><img layim-click="setSkin" src="{{ item }}"></li>'
         , '{{# }); }}'
-        , '<li layim-event="setSkin"><cite>简约</cite></li>'
+        , '<li layim-click="setSkin"><cite>简约</cite></li>'
         , '</ul>'].join('');
 
+    
     //聊天主模板
-    var elemChatTpl = ['<div class="layim-chat layim-chat-{{d.data.type}}{{d.first ? " layui-show" : ""}}">'
+    var elemChatTpl = ['<div class="layim-chat layim-chat-{{d.data.type}} layui-show">'
         , '<div class="layui-unselect layim-chat-title">'
+        , '<span class="layim-chat-username">{{ d.data.name||"佚名" }} {{d.data.temporary ? "<cite>临时会话</cite>" : ""}}</span>'
         , '<div class="layim-chat-other">'
-        , '<img class="layim-{{ d.data.type }}{{ d.data.id }}" src="{{ d.data.avatar }}"><span class="layim-chat-username" layim-event="{{ d.data.type==="group" ? \"groupMembers\" : \"\" }}">{{ d.data.name||"佚名" }} {{d.data.temporary ? "<cite>临时会话</cite>" : ""}} {{# if(d.data.type==="group"){ }} <em class="layim-chat-members"></em><i class="layui-icon">&#xe61a;</i> {{# } }}</span>'
-        , '<p class="layim-chat-status"></p>'
+        , '<a href="javascript:;" class="layim-chat-btn"><i class="layui-icon layui-icon-add-circle"></i></a>'
+        , '<a href="javascript:;" class="layim-chat-btn"><i class="layui-icon layui-icon-set"></i></a>'
         , '</div>'
         , '</div>'
         , '<div class="layim-chat-main">'
@@ -349,37 +355,37 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '</div>'
         , '<div class="layim-chat-footer">'
         , '<div class="layui-unselect layim-chat-tool" data-json="{{encodeURIComponent(JSON.stringify(d.data))}}">'
-        , '<span class="layui-icon layim-tool-face" title="选择表情" layim-event="face">&#xe60c;</span>'
+        , '<span class="layui-icon layim-tool-face" title="选择表情" layim-click="face">&#xe60c;</span>'
         , '{{# if(d.base && d.base.uploadImage){ }}'
-        , '<span class="layui-icon layim-tool-image" title="上传图片" layim-event="image">&#xe60d;<input type="file" name="file"></span>'
+        , '<span class="layui-icon layim-tool-image" title="上传图片" layim-click="image">&#xe60d;<input type="file" name="file"></span>'
         , '{{# }; }}'
         , '{{# if(d.base && d.base.uploadFile){ }}'
-        , '<span class="layui-icon layim-tool-image" title="发送文件" layim-event="image" data-type="file">&#xe61d;<input type="file" name="file"></span>'
+        , '<span class="layui-icon layim-tool-image" title="发送文件" layim-click="image" data-type="file">&#xe61d;<input type="file" name="file"></span>'
         , '{{# }; }}'
         , '{{# if(d.base && d.base.isAudio){ }}'
-        , '<span class="layui-icon layim-tool-audio" title="发送网络音频" layim-event="media" data-type="audio">&#xe6fc;</span>'
+        , '<span class="layui-icon layim-tool-audio" title="发送网络音频" layim-click="media" data-type="audio">&#xe6fc;</span>'
         , '{{# }; }}'
         , '{{# if(d.base && d.base.isVideo){ }}'
-        , '<span class="layui-icon layim-tool-video" title="发送网络视频" layim-event="media" data-type="video">&#xe6ed;</span>'
+        , '<span class="layui-icon layim-tool-video" title="发送网络视频" layim-click="media" data-type="video">&#xe6ed;</span>'
         , '{{# }; }}'
         , '{{# layui.each(d.base.tool, function(index, item){ }}'
-        , '<span class="layui-icon layim-tool-{{item.alias}}" title="{{item.title}}" layim-event="extend" lay-filter="{{ item.alias }}">{{item.icon}}</span>'
+        , '<span class="layui-icon layim-tool-{{item.alias}}" title="{{item.title}}" layim-click="extend" lay-filter="{{ item.alias }}">{{item.icon}}</span>'
         , '{{# }); }}'
         , '{{# if(d.base && d.base.chatLog){ }}'
-        , '<span class="layim-tool-log" layim-event="chatLog"><i class="layui-icon">&#xe60e;</i>聊天记录</span>'
+        , '<span class="layim-tool-log" layim-click="chatLog"><i class="layui-icon">&#xe60e;</i>聊天记录</span>'
         , '{{# }; }}'
         , '</div>'
         , '<div class="layim-chat-textarea"><textarea></textarea></div>'
         , '<div class="layim-chat-bottom">'
         , '<div class="layim-chat-send">'
-        , '{{# if(!d.base.brief){ }}'
-        , '<span class="layim-send-close" layim-event="closeThisChat">关闭</span>'
-        , '{{# } }}'
-        , '<span class="layim-send-btn" layim-event="send">发送</span>'
-        , '<span class="layim-send-set" layim-event="setSend" lay-type="show"><em class="layui-edge"></em></span>'
+        //, '{{# if(!d.base.brief){ }}'
+        //, '<span class="layim-send-close" layim-click="closeThisChat">关闭</span>'
+        //, '{{# } }}'
+        , '<span class="layim-send-btn" layim-click="send">发送</span>'
+        , '<span class="layim-send-set" layim-click="setSend" lay-type="show"><em class="layui-edge"></em></span>'
         , '<ul class="layui-anim layim-menu-box">'
-        , '<li {{d.local.sendHotKey !== "Ctrl+Enter" ? "class=layim-this" : ""}} layim-event="setSend" lay-type="Enter"><i class="layui-icon">&#xe618;</i>按Enter键发送消息</li>'
-        , '<li {{d.local.sendHotKey === "Ctrl+Enter" ? "class=layim-this" : ""}} layim-event="setSend"  lay-type="Ctrl+Enter"><i class="layui-icon">&#xe618;</i>按Ctrl+Enter键发送消息</li>'
+        , '<li {{d.local.sendHotKey !== "Ctrl+Enter" ? "class=layim-this" : ""}} layim-click="setSend" lay-type="Enter"><i class="layui-icon">&#xe618;</i>按Enter键发送消息</li>'
+        , '<li {{d.local.sendHotKey === "Ctrl+Enter" ? "class=layim-this" : ""}} layim-click="setSend"  lay-type="Ctrl+Enter"><i class="layui-icon">&#xe618;</i>按Ctrl+Enter键发送消息</li>'
         , '</ul>'
         , '</div>'
         , '</div>'
@@ -419,7 +425,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '<div class="layim-chat-text">{{ layui.data.content(d.content||"&nbsp") }}</div>'
         , '</li>'].join('');
 
-    var elemChatList = '<li class="layim-{{ d.data.type }}{{ d.data.id }} layim-chatlist-{{ d.data.type }}{{ d.data.id }} layim-this" layim-event="tabChat"><img src="{{ d.data.avatar }}"><span>{{ d.data.name||"佚名" }}</span>{{# if(!d.base.brief){ }}<i class="layui-icon" layim-event="closeChat">&#x1007;</i>{{# } }}</li>';
+    var elemChatList = '<li class="layim-{{ d.data.type }}{{ d.data.id }} layim-chatlist-{{ d.data.type }}{{ d.data.id }} layim-this" layim-click="tabChat"><img src="{{ d.data.avatar }}"><span>{{ d.data.name||"佚名" }}</span>{{# if(!d.base.brief){ }}<i class="layui-icon" layim-click="closeChat">&#x1007;</i>{{# } }}</li>';
 
     //补齐数位
     var digit = function (num) {
@@ -457,10 +463,10 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
                 return '<a class="layui-layim-file" href="' + href + '" download target="_blank"><i class="layui-icon">&#xe61e;</i><cite>' + (text || href) + '</cite></a>';
             })
             .replace(/audio\[([^\s]+?)\]/g, function (audio) {  //转义音频
-                return '<div class="layui-unselect layui-layim-audio" layim-event="playAudio" data-src="' + audio.replace(/(^audio\[)|(\]$)/g, '') + '"><i class="layui-icon">&#xe652;</i><p>音频消息</p></div>';
+                return '<div class="layui-unselect layui-layim-audio" layim-click="playAudio" data-src="' + audio.replace(/(^audio\[)|(\]$)/g, '') + '"><i class="layui-icon">&#xe652;</i><p>音频消息</p></div>';
             })
             .replace(/video\[([^\s]+?)\]/g, function (video) {  //转义音频
-                return '<div class="layui-unselect layui-layim-video" layim-event="playVideo" data-src="' + video.replace(/(^video\[)|(\]$)/g, '') + '"><i class="layui-icon">&#xe652;</i></div>';
+                return '<div class="layui-unselect layui-layim-video" layim-click="playVideo" data-src="' + video.replace(/(^video\[)|(\]$)/g, '') + '"><i class="layui-icon">&#xe652;</i></div>';
             })
 
             .replace(/a\([\s\S]+?\)\[[\s\S]*?\]/g, function (str) { //转义链接
@@ -602,7 +608,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         //自定义历史会话右键菜单
         layimMain.find('.layim-list-history').on('contextmenu', 'li', function (e) {
             var othis = $(this);
-            var html = '<ul data-id="' + othis[0].id + '" data-index="' + othis.data('index') + '"><li layim-event="menuHistory" data-type="one">移除该会话</li><li layim-event="menuHistory" data-type="all">清空全部会话列表</li></ul>';
+            var html = '<ul data-id="' + othis[0].id + '" data-index="' + othis.data('index') + '"><li layim-click="menuHistory" data-type="one">移除该会话</li><li layim-click="menuHistory" data-type="all">清空全部会话列表</li></ul>';
 
             if (othis.hasClass('layim-null')) return;
 
@@ -678,35 +684,36 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         }
 
         if (chat[0]) {
-            var list = layimChat.find('.layim-chat-list');
+            setTab(0);
+            var list = layimMain.find('.layim-chat-list');
             var listThat = list.find('.layim-chatlist-' + data.type + data.id);
-            var hasFull = layimChat.find('.layui-layer-max').hasClass('layui-layer-maxmin');
+            //var hasFull = layimChat.find('.layui-layer-max').hasClass('layui-layer-maxmin');
             var chatBox = chat.children('.layim-chat-box');
 
-            //如果是最小化，则还原窗口
-            if (layimChat.css('display') === 'none') {
-                layimChat.show();
-            }
+            ////如果是最小化，则还原窗口
+            //if (layimChat.css('display') === 'none') {
+            //    layimChat.show();
+            //}
 
-            if (layimMin) {
-                layer.close(layimMin.attr('times'));
-            }
+            //if (layimMin) {
+            //    layer.close(layimMin.attr('times'));
+            //}
 
-            //如果出现多个聊天面板
-            if (list.find('li').length === 1 && !listThat[0]) {
-                hasFull || layimChat.css('width', 800);
-                list.css({
-                    height: layimChat.height()
-                }).show();
-                chatBox.css('margin-left', '200px');
-            }
+            ////如果出现多个聊天面板
+            //if (list.find('li').length === 1 && !listThat[0]) {
+            //    hasFull || layimChat.css('width', 800);
+            //    list.css({
+            //        height: layimChat.height()
+            //    }).show();
+            //    chatBox.css('margin-left', '200px');
+            //}
 
             //打开的是非当前聊天面板，则新增面板
             if (!listThat[0]) {
                 list.append(laytpl(elemChatList).render(render));
                 chatBox.append(laytpl(elemChatTpl).render(render));
                 syncGray(data);
-                resizeChat();
+                resizeWin();
             }
 
             changeChat(list.find('.layim-chatlist-' + data.type + data.id));
@@ -717,85 +724,94 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             return chatIndex;
         }
 
-        render.first = !0;
+        //render.first = !0;
 
-        var index = chatIndex = layer.open({
-            type: 1
-            , area: '600px'
-            , skin: 'layui-box layui-layim-chat'
-            , id: 'layui-layim-chat'
-            , title: '&#8203;'
-            , shade: false
-            , maxmin: true
-            , offset: data.offset || 'auto'
-            , anim: data.anim || 0
-            , closeBtn: cache.base.brief ? false : 1
-            , content: laytpl('<ul class="layui-unselect layim-chat-list">' + elemChatList + '</ul><div class="layim-chat-box">' + elemChatTpl + '</div>').render(render)
-            , success: function (layero) {
-                layimChat = layero;
+        //var index = chatIndex = layer.open({
+        //    type: 1
+        //    , area: '600px'
+        //    , skin: 'layui-box layui-layim-chat'
+        //    , id: 'layui-layim-chat'
+        //    , title: '&#8203;'
+        //    , shade: false
+        //    , maxmin: true
+        //    , offset: data.offset || 'auto'
+        //    , anim: data.anim || 0
+        //    , closeBtn: cache.base.brief ? false : 1
+        //    , content: laytpl('<ul class="layui-unselect layim-chat-list">' + elemChatList + '</ul><div class="layim-chat-box">' + elemChatTpl + '</div>').render(render)
+        //    , success: function (layero) {
+        //        layimChat = layero;
 
-                layero.css({
-                    'min-width': '500px'
-                    , 'min-height': '420px'
-                });
+        //        layero.css({
+        //            'min-width': '500px'
+        //            , 'min-height': '420px'
+        //        });
 
-                syncGray(data);
+        //        syncGray(data);
 
-                typeof data.success === 'function' && data.success(layero);
+        //        typeof data.success === 'function' && data.success(layero);
 
-                hotkeySend();
-                setSkin(layero);
-                setHistory(data);
+        //        hotkeySend();
+        //        setSkin(layero);
+        //        setHistory(data);
 
-                viewChatlog();
-                showOffMessage();
+        //        viewChatlog();
+        //        showOffMessage();
 
-                //聊天窗口的切换监听
-                layui.each(call.chatChange, function (index, item) {
-                    item && item(thisChat());
-                });
+        //        //聊天窗口的切换监听
+        //        layui.each(call.chatChange, function (index, item) {
+        //            item && item(thisChat());
+        //        });
 
-                //查看大图
-                layero.on('dblclick', '.layui-layim-photos', function () {
-                    var src = this.src;
-                    layer.close(popchat.photosIndex);
-                    layer.photos({
-                        photos: {
-                            data: [{
-                                "alt": "大图模式",
-                                "src": src
-                            }]
-                        }
-                        , shade: 0.01
-                        , closeBtn: 2
-                        , anim: 0
-                        , resize: false
-                        , success: function (layero, index) {
-                            popchat.photosIndex = index;
-                        }
-                    });
-                });
-            }
-            , full: function (layero) {
-                layer.style(index, {
-                    width: '100%'
-                    , height: '100%'
-                }, true);
-                resizeChat();
-            }
-            , resizing: resizeChat
-            , restore: resizeChat
-            , min: function () {
-                setChatMin();
-                return false;
-            }
-            , end: function () {
-                layer.closeAll('tips');
-                layimChat = null;
-            }
-        });
-        return index;
+        //        //查看大图
+        //        layero.on('dblclick', '.layui-layim-photos', function () {
+        //            var src = this.src;
+        //            layer.close(popchat.photosIndex);
+        //            layer.photos({
+        //                photos: {
+        //                    data: [{
+        //                        "alt": "大图模式",
+        //                        "src": src
+        //                    }]
+        //                }
+        //                , shade: 0.01
+        //                , closeBtn: 2
+        //                , anim: 0
+        //                , resize: false
+        //                , success: function (layero, index) {
+        //                    popchat.photosIndex = index;
+        //                }
+        //            });
+        //        });
+        //    }
+        //    , full: function (layero) {
+        //        layer.style(index, {
+        //            width: '100%'
+        //            , height: '100%'
+        //        }, true);
+        //        resizeChat();
+        //    }
+        //    , resizing: resizeChat
+        //    , restore: resizeChat
+        //    , min: function () {
+        //        setChatMin();
+        //        return false;
+        //    }
+        //    , end: function () {
+        //        layer.closeAll('tips');
+        //        layimChat = null;
+        //    }
+        //});
+        //return index;
     };
+
+    var setTab = function (othis) {
+        events.tab(othis);
+    }
+
+    // 显示好友、群组信息
+    var showInfo = function(data) {
+
+    }
 
     //同步置灰状态
     var syncGray = function (data) {
@@ -818,8 +834,8 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         content.css({ height: winHeight - 56 });
         list.css({ height: winHeight - 56 });
         chatMain.css({ height: winHeight - 56 - 41 - 20 - 158 });
-        friend.css({ height: winHeight - 56 - 41 - 20 });
-        group.css({ height: winHeight - 56 - 41 });
+        friend.css({ height: winHeight - 56 - 42 - 20 });
+        group.css({ height: winHeight - 56 - 42 });
         contactBox.css({ width: winWidth - 250, height: winHeight - 56 });
     }
 
@@ -930,24 +946,24 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
                 changeChat(index === 0 ? elem.next() : elem.prev());
             }
 
-            var length = layimChat.find(str).length;
+            //var length = layimMain.find(str).length;
 
-            //关闭聊天界面
-            if (length === 1) {
-                return layer.close(chatIndex);
-            }
+            ////关闭聊天界面
+            //if (length === 1) {
+            //    return layer.close(chatIndex);
+            //}
 
             elem.remove();
             cont.remove();
 
             //只剩下1个列表，隐藏左侧区块
-            if (length === 2) {
-                layimChat.find('.layim-chat-list').hide();
-                if (!hasFull) {
-                    layimChat.css('width', '600px');
-                }
-                layimChat.find('.layim-chat-box').css('margin-left', 0);
-            }
+            //if (length === 2) {
+            //    layimChat.find('.layim-chat-list').hide();
+            //    if (!hasFull) {
+            //        layimChat.css('width', '600px');
+            //    }
+            //    layimChat.find('.layim-chat-box').css('margin-left', 0);
+            //}
 
             return false;
         }
@@ -957,7 +973,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         cont.find('textarea').focus();
 
         //聊天窗口的切换监听
-        layui.each(call.chatChange, function (index, item) {
+        layui.each(call && call.chatChange, function (index, item) {
             item && item(thisChat());
         });
         showOffMessage();
@@ -1007,7 +1023,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
 
         if (!layimMain) return;
 
-        var historyElem = layimMain.find('.layim-list-history');
+       // var historyElem = layimMain.find('.layim-list-history');
 
         data.historyTime = new Date().getTime();
         history[data.type + data.id] = data;
@@ -1019,15 +1035,15 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             , value: local
         });
 
-        if (is) return;
+        //if (is) return;
 
-        obj[data.type + data.id] = data;
-        var historyList = laytpl(listTpl({
-            type: 'history'
-            , item: 'd.data'
-        })).render({ data: obj });
-        historyElem.prepend(historyList);
-        historyElem.find('.layim-null').remove();
+        //obj[data.type + data.id] = data;
+        //var historyList = laytpl(contactTpl({
+        //    type: 'history'
+        //    , item: 'd.data'
+        //})).render({ data: obj });
+        //historyElem.prepend(historyList);
+        //historyElem.find('.layim-null').remove();
     };
 
     //发送消息
@@ -1291,7 +1307,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
 
         if (has) return;
 
-        var list = laytpl(listTpl({
+        var list = laytpl(contactTpl({
             type: data.type
             , item: 'd.data'
             , index: data.type === 'friend' ? 'data.groupIndex' : null
@@ -1361,7 +1377,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         if (length >= MAX_ITEM) {
             var first = ul.find('li').eq(0);
             if (!ul.prev().hasClass('layim-chat-system')) {
-                ul.before('<div class="layim-chat-system"><span layim-event="chatLog">查看更多记录</span></div>');
+                ul.before('<div class="layim-chat-system"><span layim-click="chatLog">查看更多记录</span></div>');
             }
             if (length > MAX_ITEM) {
                 first.remove();
@@ -1528,7 +1544,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
                     }
                     if (data.length > 0) {
                         for (var l = 0; l < data.length; l++) {
-                            html += '<li layim-event="chat" data-type="' + data[l].type + '" data-index="' + data[l].index + '" data-list="' + data[l].list + '"><img src="' + data[l].avatar + '"><span>' + (data[l].username || data[l].groupname || '佚名') + '</span><p>' + (data[l].remark || data[l].sign || '') + '</p></li>';
+                            html += '<li layim-click="chat" data-type="' + data[l].type + '" data-index="' + data[l].index + '" data-list="' + data[l].list + '"><img src="' + data[l].avatar + '"><span>' + (data[l].username || data[l].groupname || '佚名') + '</span><p>' + (data[l].remark || data[l].sign || '') + '</p></li>';
                         }
                     } else {
                         html = '<li class="layim-null">无搜索结果</li>';
@@ -1632,6 +1648,25 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
                 var filename = (src || '').replace(layui.cache.dir + 'css/modules/layim/skin/', '');
                 item && item(filename, src);
             });
+        }
+
+        , info: function(othis) {
+            var local = layui.data('layim')[cache.mine.id] || {};
+            var type = othis.data('type'), index = othis.data('index');
+            var list = othis.attr('data-list') || othis.index(), data = {};
+            if (type === 'friend') {
+                data = cache[type][index].list[list];
+            } else if (type === 'group') {
+                data = cache[type][list];
+            } else if (type === 'history') {
+                data = (local.history || {})[index] || {};
+            }
+            data.name = data.name || data.username || data.groupname;
+            if (type !== 'history') {
+                data.type = type;
+            }
+
+            console.log(data);
         }
 
         //弹出聊天面板
