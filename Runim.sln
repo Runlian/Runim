@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28803.452
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runim.Desktop", "Runim.Desktop\Runim.Desktop.csproj", "{0F9E5C75-CADF-4C19-A25A-7B6B1835D5F7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Runim.Web", "Runim.Web\Runim.Web.csproj", "{2B646E7B-4819-49F5-B50F-9E9F70A063C4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0F9E5C75-CADF-4C19-A25A-7B6B1835D5F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F9E5C75-CADF-4C19-A25A-7B6B1835D5F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F9E5C75-CADF-4C19-A25A-7B6B1835D5F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F9E5C75-CADF-4C19-A25A-7B6B1835D5F7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B646E7B-4819-49F5-B50F-9E9F70A063C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B646E7B-4819-49F5-B50F-9E9F70A063C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B646E7B-4819-49F5-B50F-9E9F70A063C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B646E7B-4819-49F5-B50F-9E9F70A063C4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9243EAF6-CB94-460D-863F-12488CAC948E}
+	EndGlobalSection
+EndGlobal

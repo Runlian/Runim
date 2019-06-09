@@ -28,7 +28,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             var othis = $(this), methid = othis.attr('layim-click');
             events[methid] ? events[methid].call(this, othis, e) : '';
         });
-        
+
         $('body').on('dblclick', '*[layim-dblclick]', function (e) {
             var othis = $(this), methid = othis.attr('layim-dblclick');
             events[methid] ? events[methid].call(this, othis, e) : '';
@@ -264,7 +264,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '</div>'
 
         , '<div class="layim-contact-list layim-tab-content">'
-        , '<div class="layui-tab layui-tab-brief">'
+        , '<div class="layui-tab layui-tab-brief" lay-filter="layim-contact-tab">'
         , '<ul class="layui-tab-title">'
         , '<li class="layui-this">好友</li>'
         , '<li>群聊</li>'
@@ -299,7 +299,18 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '</div>'
         , '</div>'
         , '</div>'
-        , '<div class="layim-contact-box"></div>'
+        , '<div class="layim-contact-tab-content">'
+        , '<div class="layui-tab-item layui-show">'
+        , '<div class="layim-contact-box">'
+        , '<div class="layim-null">'
+        , '<img src="{{layui.config.dir}}/css/modules/layim/images/contact.svg">'
+        , '</div>'
+        , '</div>'
+        , '</div>'
+        , '<div class="layui-tab-item">'
+        , '<div class="layim-contact-box">2</div>'
+        , '</div>'
+        , '</div>'
         , '</div>'
         , '<ul class="layui-unselect layim-tab-content">'
         , '<li>'
@@ -340,7 +351,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '<li layim-click="setSkin"><cite>简约</cite></li>'
         , '</ul>'].join('');
 
-    
+
     //聊天主模板
     var elemChatTpl = ['<div class="layim-chat layim-chat-{{d.data.type}} layui-show">'
         , '<div class="layui-unselect layim-chat-title">'
@@ -522,6 +533,11 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
                 };
                 cache = $.extend(cache, obj);
                 popim(laytpl(elemTpl).render(obj));
+                // 联系人右侧联动
+                element.on('tab(layim-contact-tab)', function (data) {
+                    var item = $(data.elem).parents(".layim-contact-list").children('.layim-contact-tab-content').children('.layui-tab-item');
+                    item.eq(data.index).addClass(SHOW).siblings().removeClass(SHOW);
+                });
                 if (local.close || options.min) {
                     popmin();
                 }
@@ -710,6 +726,9 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
 
             //打开的是非当前聊天面板，则新增面板
             if (!listThat[0]) {
+                // 删除null列表
+                list.find(".layim-null").remove();
+
                 list.append(laytpl(elemChatList).render(render));
                 chatBox.append(laytpl(elemChatTpl).render(render));
                 syncGray(data);
@@ -809,7 +828,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
     }
 
     // 显示好友、群组信息
-    var showInfo = function(data) {
+    var showInfo = function (data) {
 
     }
 
@@ -994,6 +1013,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         if (!layimMain) return;
         var index = $('.layim-chat-list .' + THIS).index();
         var cont = layimMain.find('.layim-chat').eq(index);
+        if (cont.length == 0) return;
         var to = JSON.parse(decodeURIComponent(cont.find('.layim-chat-tool').data('json')));
         return {
             elem: cont
@@ -1023,7 +1043,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
 
         if (!layimMain) return;
 
-       // var historyElem = layimMain.find('.layim-list-history');
+        // var historyElem = layimMain.find('.layim-list-history');
 
         data.historyTime = new Date().getTime();
         history[data.type + data.id] = data;
@@ -1650,7 +1670,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             });
         }
 
-        , info: function(othis) {
+        , info: function (othis) {
             var local = layui.data('layim')[cache.mine.id] || {};
             var type = othis.data('type'), index = othis.data('index');
             var list = othis.attr('data-list') || othis.index(), data = {};
