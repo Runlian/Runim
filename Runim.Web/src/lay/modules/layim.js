@@ -7,7 +7,7 @@
     
  */
 
-layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
+layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (exports) {
 
     var v = '3.8.0';
     var $ = layui.$;
@@ -165,7 +165,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             , '{{# } }}'
             , '</ul>'
             , '<div class="layim-chat-box">'
-            , '{{# var length1 = 0; layui.each(' + options.item + ', function(i, data){ length1++; }}'
+            , '{{# var length1 = 0; layui.each(' + options.item + ', function(i, data){ length1++;}}'
             , '<div class="layim-chat layim-chat-{{ data.type }}{{ Object.getOwnPropertyNames(' + options.item + ').length == length1 ? " layui-show" : ""}}">'
             , '<div class="layui-unselect layim-chat-title">'
             , '<span class="layim-chat-username">{{ data.name||"佚名" }} {{data.temporary ? "<cite>临时会话</cite>" : ""}}</span>'
@@ -174,6 +174,8 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             , '<a href="javascript:;" class="layim-chat-btn"><i class="layui-icon layui-icon-set"></i></a>'
             , '</div>'
             , '</div>'
+            , '<div class="layim-chat-body">'
+            , '<div id="layim-{{ data.type }}-{{ data.id }}" class="layim-chat-body-left">'
             , '<div class="layim-chat-main">'
             , '<ul></ul>'
             , '</div>'
@@ -211,6 +213,16 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             , '<li {{d.local.sendHotKey !== "Ctrl+Enter" ? "class=layim-this" : ""}} layim-click="setSend" lay-type="Enter"><i class="layui-icon">&#xe618;</i>按Enter键发送消息</li>'
             , '<li {{d.local.sendHotKey === "Ctrl+Enter" ? "class=layim-this" : ""}} layim-click="setSend"  lay-type="Ctrl+Enter"><i class="layui-icon">&#xe618;</i>按Ctrl+Enter键发送消息</li>'
             , '</ul>'
+            , '</div>'
+            , '</div>'
+            , '</div>'
+            , '</div>'
+            , '<div class="layim-chat-body-right">'
+            , '{{# if(data.type === "group"){ }}'
+            , '<div class="layim-group-members">'
+            , '</div>'
+            , '{{# }; }}'
+            , '<div class="layim-chatlog-box">'
             , '</div>'
             , '</div>'
             , '</div>'
@@ -400,6 +412,10 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         , '</ul>'
         , '</div>'
         , '</div>'
+        , '<div class="layim-chatlog-box">'
+        , '</div>'
+        , '<div class="layim-chatlog-box">'
+        , '</div>'
         , '</div>'
         , '</div>'].join('');
 
@@ -533,6 +549,33 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
                 };
                 cache = $.extend(cache, obj);
                 popim(laytpl(elemTpl).render(obj));
+
+                $("#layui-layim-chat").split({
+                    orientation: 'vertical',
+                    limit: { leftUpper: 70, rightBottom: $("#layui-layim-chat").width() - 250 },
+                    position: '25%',
+                    percent: true
+                });
+
+                layui.each(local.history, function (index, item) {
+                    var root = $("#layim-" + item.type + "-" + item.id);
+                    var rootH = root.height();
+                    console.log(root);
+                    var pos = root.height() - 157;
+                    $("#layim-" + item.type + "-" + item.id).split({
+                        orientation: 'horizontal',
+                        limit: { leftUpper: 70, rightBottom: 157 },
+                        position: pos / rootH * 100 + '%',
+                        percent: true,
+                        onDrag: function (e) {
+
+	                        var mainH = root.find(".top_panel").eq(0).height();
+                            var elem = root.find('textarea')[0];
+                            $(elem).css({ height: rootH - mainH - 38 - 44 - 5 - 4 });
+                        }
+                    });
+                });
+
                 // 联系人右侧联动
                 element.on('tab(layim-contact-tab)', function (data) {
                     var item = $(data.elem).parents(".layim-contact-list").children('.layim-contact-tab-content').children('.layui-tab-item');
@@ -845,6 +888,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
         var content = layimMain.find('.layim-tab-content')
             , list = layimMain.find('.layim-chat-list')
             , chatMain = layimMain.find('.layim-chat-main')
+            , chatContainer = layimMain.find('.layim-chat-body-left')
             , friend = layimMain.find('.layim-list-friend')
             , group = layimMain.find('.layim-list-group')
             , contactBox = layimMain.find('.layim-contact-box')
@@ -852,7 +896,8 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             , winWidth = layimMain.width();
         content.css({ height: winHeight - 56 });
         list.css({ height: winHeight - 56 });
-        chatMain.css({ height: winHeight - 56 - 41 - 20 - 158 });
+        chatContainer.css({ height: winHeight - 56 - 42 });
+        //chatMain.css({ height: winHeight - 56 - 41 - 20 - 158 });
         friend.css({ height: winHeight - 56 - 42 - 20 });
         group.css({ height: winHeight - 56 - 42 });
         contactBox.css({ width: winWidth - 250, height: winHeight - 56 });
@@ -1685,8 +1730,6 @@ layui.define(['layer', 'laytpl', 'element', 'upload'], function (exports) {
             if (type !== 'history') {
                 data.type = type;
             }
-
-            console.log(data);
         }
 
         //弹出聊天面板

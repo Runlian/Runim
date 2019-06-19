@@ -206,6 +206,7 @@
     <Content Include="src\css\modules\layim\skin\5.jpg" />
     <Content Include="src\css\modules\layim\skin\logo.jpg" />
     <Content Include="src\css\modules\layim\voice\default.mp3" />
+    <Content Include="src\css\modules\split.css" />
     <Content Include="src\font\iconfont.svg" />
     <Content Include="src\images\face\0.gif" />
     <Content Include="src\images\face\1.gif" />
@@ -303,6 +304,7 @@
     <Content Include="src\lay\modules\mobile\zepto.js" />
     <Content Include="src\lay\modules\rate.js" />
     <Content Include="src\lay\modules\slider.js" />
+    <Content Include="src\lay\modules\split.js" />
     <Content Include="src\lay\modules\table.js" />
     <Content Include="src\lay\modules\transfer.js" />
     <Content Include="src\lay\modules\tree.js" />
