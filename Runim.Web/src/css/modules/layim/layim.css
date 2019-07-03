@@ -68,7 +68,7 @@ body .layui-layim-chat .layui-layer-content{overflow: visible;}
 .layui-layim-tab li.layim-this:after{content: ''; position: absolute; left: 50%; bottom: 0; width: 0; height: 0;margin-left: -6px; border-left: solid 6px transparent;border-right: solid 6px transparent;border-bottom: solid 6px #fff;}
 .layui-layim-tab li.layim-hide{display: none;}
 .layui-layim-tab li:hover{opacity: 0.8; filter: Alpha(opacity=80);}
-.layim-tab-content{display: none;position: relative;overflow: hidden; background-color: #fff;pointer-events: auto;}
+.layim-tab-content{display: none;position: relative;overflow: visible !important; background-color: #fff;pointer-events: auto;}
 /*.layim-tab-content:hover{overflow-y: auto;}*/
 .layim-tab-content li h5{position:relative; margin-right: 15px; padding-left: 30px; height: 28px; line-height: 28px; cursor:pointer; font-size:0; white-space: nowrap; overflow: hidden;}
 .layim-tab-content li h5 *{font-size: 14px;}
@@ -136,8 +136,9 @@ body .layui-layim-chat .layui-layer-content{background: none;}
 .layim-chat-list li .layui-icon{display: none; position: absolute; right: 10px; top: 10px; color: #555; font-size: 22px;}
 .layim-chat-list li .layui-icon:hover{color: #c00;}
 .layim-chat-list li:hover .layui-icon{display: inline-block;}
-
-.layim-chat-box{ float: left;}
+.layim-chat-box{ overflow: visible !important;}
+.layim-chat-body{ float: left;width: 100%;}
+.layim-chat-body[data-type="group"]{ width: calc(100% - 156px);}
 
 .layim-chat-system{margin: 10px 0; text-align: center;}
 .layim-chat-system span{display: inline-block; line-height: 30px; padding: 0 15px; border-radius: 3px; background-color: #e2e2e2; cursor: default; font-size: 14px;}
@@ -154,7 +155,7 @@ body .layui-layim-chat .layui-layer-content{background: none;}
 .layim-chat-group .layim-chat-other .layim-chat-username em{padding: 0 10px; color: #999;}
 
 .layim-chat-container{height: 100%;}
-.layim-chat-main{height: 262px;overflow: hidden;overflow-y: auto;}
+.layim-chat-main{height: 262px;overflow: hidden;overflow-y: auto!important;}
 .layim-chat-main ul{ padding: 15px 15px 5px 15px; }
 .layim-chat-main ul li{position: relative; font-size: 0; margin-bottom: 10px; padding-left: 60px; min-height: 68px;}
 .layim-chat-user,
@@ -189,7 +190,7 @@ body .layui-layim-chat .layui-layer-content{background: none;}
 .layim-chat-mine .layim-chat-text:after{left: auto; right: -10px; border-top-color: #5FB878;}
 .layim-chat-mine .layim-chat-text a{color: #fff;}
 
-.layim-chat-footer{border-top: 1px solid #e6e6e6;}
+.layim-chat-footer{border-top: 1px solid #e6e6e6;overflow: visible !important;}
 .layim-chat-tool{position: relative; padding: 0 8px; height: 38px; line-height: 38px; font-size: 0;}
 .layim-chat-tool span{position: relative; margin: 0 10px; display: inline-block; *display:inline; *zoom:1; vertical-align:top; font-size: 24px; cursor: pointer;}
 .layim-chat-tool .layim-tool-log{position: absolute; right: 5px; font-size: 14px; }
@@ -223,7 +224,7 @@ body .layui-layim-face  .layui-layer-content{padding:0; background-color:#fff; c
 
 /* 联系人面板 */
 .layim-contact-list{ background-color: #fff;}
-.layim-contact-list .layui-tab{ margin: 0;position: fixed;width: 250px;}
+.layim-contact-list .layui-tab{ margin: 0;position: fixed;width: 249px;background-color: #fafafa;border-right: 1px solid #e6e6e6;}
 .layim-contact-list .layui-tab-title{ height: 41px;border-color: #ebebec;text-align: center;}
 .layim-contact-list .layui-tab-title li{ line-height: 41px;min-width: initial;padding: 0 5px;margin: 0 20px;color: #999;}
 .layim-contact-list .layui-tab-title .layui-this{ color: #0188fb;}
@@ -231,31 +232,26 @@ body .layui-layim-face  .layui-layer-content{padding:0; background-color:#fff; c
 .layim-contact-list .layui-tab-content{ padding: 0;}
 .layim-list-friend{padding: 10px 0;overflow: hidden; overflow-y: auto;}
 .layim-list-group{overflow: hidden; overflow-y: auto;}
-.layim-contact-box{ margin-left: 250px;background-color: #e5e7ec;}
+.layim-contact-box{ position: relative; margin-left: 250px;background-color: #fff;}
+.layim-contact-box .layim-null{ position: absolute;left: 0;right: 0;top: 0;bottom: 0;margin: auto;width: 285px;height: 258px;text-align: center;}
+.layim-contact-box .layim-null h2{ margin-top: 15px;}
+.layim-contact-box .layim-null p{ color: #999;}
 /* 最小化 */
-body .layui-layim-min {
-    border: 1px solid #D9D9D9;
-}
+body .layui-layim-min { border: 1px solid #D9D9D9;}
 .layui-layim-min .layui-layer-content{margin: 0 5px; padding: 5px 10px; white-space: nowrap;}
 .layui-layim-close .layui-layer-content span {width: auto; max-width: 120px;}
 
 
 /* 查看群员 */
-body .layui-layim-members{ margin: 25px 0 0 -75px; border: none; background: none;}
-body .layui-layim-members  .layui-layer-content{padding:0; background: none; color:#666; box-shadow:none}
-.layui-layim-members .layui-layer-TipsG{display:none;}
-.layui-layim-members ul{position:relative; width: 578px; height: 200px; padding: 10px 10px 0 10px; border:1px solid #D9D9D9; background-color:#fff; background-color: rgba(255,255,255,.9); box-shadow: none; overflow: hidden;}
-.layui-layim-members ul:hover{overflow: auto;}
-.layui-layim-members ul{font-size: 0;}
-.layui-layim-members li,
-.layim-add-img,
-.layim-add-remark{display: inline-block; *display:inline; *zoom:1; vertical-align: top; font-size: 14px;}
-.layui-layim-members li{width: 112px; margin: 10px 0; text-align: center}
-.layui-layim-members li a{position: relative; display: inline-block;  max-width: 100%;}
-.layui-layim-members li a:after{content: ''; position: absolute; width: 46px; height: 46px; left: 50%; margin-left: -23px; top: 0;  border: 1px solid #eee; border-color: rgba(0,0,0,.1);  border-radius: 100%;}
-.layui-layim-members li img{width: 48px; height: 48px; border-radius: 100%;}
-.layui-layim-members li:hover{opacity: 0.9;}
-.layui-layim-members li a cite{display: block; padding: 0 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;}
+.layim-group-members{ border-left: 1px solid #e6e6e6;float: left;width: 155px;margin-top: -1px;}
+.layim-members-title{ padding: 5px 10px;font-size: 16px;}
+.layim-members-list{overflow: hidden;}
+.layim-members-list:hover{ overflow-y: auto;}
+.layim-members-list li{ padding: 5px 10px;color: #666;}
+.layim-members-list li:hover{ background-color: #f2f2f2;}
+.layim-members-list li img{ width: 20px;height: 20px;border-radius: 20px;}
+.layim-members-list li .title{ font-size: 12px;padding-left: 5px;}
+.layim-members-list li .info{ float: right;}
 
 /* 右键面板 */
 body .layui-layim-contextmenu{margin: 70px 0 0 30px; width: 200px; padding: 5px 0; border: 1px solid #ccc; background: #fff; border-radius: 0; box-shadow: 0 0 5px rgba(0,0,0,.2);}

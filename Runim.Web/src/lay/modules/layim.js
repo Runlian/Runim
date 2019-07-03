@@ -174,8 +174,7 @@ layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (export
             , '<a href="javascript:;" class="layim-chat-btn"><i class="layui-icon layui-icon-set"></i></a>'
             , '</div>'
             , '</div>'
-            , '<div class="layim-chat-body">'
-            , '<div id="layim-{{ data.type }}-{{ data.id }}" class="layim-chat-body-left">'
+            , '<div id="layim-{{ data.type }}-{{ data.id }}" data-type="{{ data.type }}" class="layim-chat-body">'
             , '<div class="layim-chat-main">'
             , '<ul></ul>'
             , '</div>'
@@ -217,14 +216,17 @@ layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (export
             , '</div>'
             , '</div>'
             , '</div>'
-            , '<div class="layim-chat-body-right">'
             , '{{# if(data.type === "group"){ }}'
             , '<div class="layim-group-members">'
+            , '<div class="layim-members-title">成员（{{data.list.length}}）</div>'
+            , '<ul class="layim-members-list">'
+            , '{{# layui.each(data.list, function(i, d){ }}'
+            , '<li layim-dblclick="chat" data-uid="{{d.id}}" data-type="friend" data-index="{{ ' + (options.index || 'i') + ' }}"><img src="{{ data.avatar }}"><span class="title">{{ d.username||"佚名" }}</span><span class="info"></span></li>'
+            , '{{# }); }}'
+            , '</ul>'
             , '</div>'
             , '{{# }; }}'
             , '<div class="layim-chatlog-box">'
-            , '</div>'
-            , '</div>'
             , '</div>'
             , '</div>'
             , '{{# }); }}'
@@ -313,14 +315,22 @@ layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (export
         , '</div>'
         , '<div class="layim-contact-tab-content">'
         , '<div class="layui-tab-item layui-show">'
-        , '<div class="layim-contact-box">'
+        , '<div id="layim-contact-friend" class="layim-contact-box">'
         , '<div class="layim-null">'
-        , '<img src="{{layui.config.dir}}/css/modules/layim/images/contact.svg">'
+        , '<img src="' + layui.cache.dir + 'css/modules/layim/images/contact.png" ondragstart="return false;">'
+        , '<h2>打开世界的另一扇门</h2>'
+        , '<p>主动一点，世界会更大</p>'
         , '</div>'
         , '</div>'
         , '</div>'
         , '<div class="layui-tab-item">'
-        , '<div class="layim-contact-box">2</div>'
+        , '<div id="layim-contact-group" class="layim-contact-box">'
+        , '<div class="layim-null">'
+        , '<img src="' + layui.cache.dir + 'css/modules/layim/images/contact.png" ondragstart="return false;">'
+        , '<h2>打开世界的另一扇门</h2>'
+        , '<p>主动一点，世界会更大</p>'
+        , '</div>'
+        , '</div>'
         , '</div>'
         , '</div>'
         , '</div>'
@@ -560,16 +570,15 @@ layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (export
                 layui.each(local.history, function (index, item) {
                     var root = $("#layim-" + item.type + "-" + item.id);
                     var rootH = root.height();
-                    console.log(root);
-                    var pos = root.height() - 157;
+                    var pos = rootH - 157;
+                    var position = pos / rootH * 100;
                     $("#layim-" + item.type + "-" + item.id).split({
                         orientation: 'horizontal',
                         limit: { leftUpper: 70, rightBottom: 157 },
-                        position: pos / rootH * 100 + '%',
+                        position: position + '%',
                         percent: true,
                         onDrag: function (e) {
-
-	                        var mainH = root.find(".top_panel").eq(0).height();
+                            var mainH = root.find(".top_panel").eq(0).height();
                             var elem = root.find('textarea')[0];
                             $(elem).css({ height: rootH - mainH - 38 - 44 - 5 - 4 });
                         }
@@ -614,6 +623,10 @@ layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (export
             , success: function (layero) {
                 layimMain = layero;
 
+                layero.css({
+                    'min-width': '800px'
+                    , 'min-height': '600px'
+                });
                 setSkin(layero);
 
                 if (cache.base.right) {
@@ -887,8 +900,8 @@ layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (export
     var resizeWin = function () {
         var content = layimMain.find('.layim-tab-content')
             , list = layimMain.find('.layim-chat-list')
-            , chatMain = layimMain.find('.layim-chat-main')
-            , chatContainer = layimMain.find('.layim-chat-body-left')
+            , chatBody = layimMain.find('.layim-chat-body')
+            , groupMembers = layimMain.find('.layim-members-list')
             , friend = layimMain.find('.layim-list-friend')
             , group = layimMain.find('.layim-list-group')
             , contactBox = layimMain.find('.layim-contact-box')
@@ -896,8 +909,8 @@ layui.define(['layer', 'laytpl', 'element', 'upload', 'split'], function (export
             , winWidth = layimMain.width();
         content.css({ height: winHeight - 56 });
         list.css({ height: winHeight - 56 });
-        chatContainer.css({ height: winHeight - 56 - 42 });
-        //chatMain.css({ height: winHeight - 56 - 41 - 20 - 158 });
+        chatBody.css({ /*width: winWidth - 250 - 157,*/ height: winHeight - 56 - 42 });
+        groupMembers.css({ height: winHeight - 56 - 42 });
         friend.css({ height: winHeight - 56 - 42 - 20 });
         group.css({ height: winHeight - 56 - 42 });
         contactBox.css({ width: winWidth - 250, height: winHeight - 56 });

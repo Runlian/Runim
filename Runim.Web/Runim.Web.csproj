@@ -195,6 +195,7 @@
     <Content Include="src\css\modules\layim\html\chatlog.html" />
     <Content Include="src\css\modules\layim\html\find.html" />
     <Content Include="src\css\modules\layim\html\msgbox.html" />
+    <Content Include="src\css\modules\layim\images\contact.png" />
     <Content Include="src\css\modules\layim\images\contact.svg" />
     <Content Include="src\css\modules\layim\images\layim-header.png" />
     <Content Include="src\css\modules\layim\layim.css" />
